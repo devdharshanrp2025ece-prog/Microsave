@@ -1,0 +1,2929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>MicroSave | Savings Management</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #6366f1;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --info: #0284c7;
+
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --text: #172033;
+            --muted: #64748b;
+            --border: #e5e7eb;
+
+            --sidebar: #111827;
+            --sidebar-hover: #1f2937;
+
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 250px;
+            background: var(--sidebar);
+            color: white;
+            padding: 22px 14px;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px 28px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            font-weight: bold;
+        }
+
+        .logo h2 {
+            font-size: 19px;
+            letter-spacing: .3px;
+        }
+
+        .logo span {
+            color: #a5b4fc;
+            font-size: 11px;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .nav-title {
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 13px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 13px;
+            border-radius: 10px;
+            color: #cbd5e1;
+            cursor: pointer;
+            margin-bottom: 4px;
+            transition: .2s;
+            font-size: 14px;
+        }
+
+        .nav-item:hover {
+            background: var(--sidebar-hover);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, #4f46e5, #6366f1);
+            color: white;
+            box-shadow: 0 5px 15px rgba(79, 70, 229, .25);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* ================= MAIN ================= */
+
+        .main {
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 72px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            position: sticky;
+            top: 0;
+            z-index: 500;
+        }
+
+        .page-title h1 {
+            font-size: 21px;
+        }
+
+        .page-title p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .system-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--success);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+        }
+
+        .content {
+            padding: 28px 30px;
+        }
+
+        /* ================= PAGES ================= */
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ================= CARDS ================= */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .icon-purple {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .icon-green {
+            background: #ecfdf5;
+            color: #16a34a;
+        }
+
+        .icon-blue {
+            background: #eff6ff;
+            color: #0284c7;
+        }
+
+        .icon-orange {
+            background: #fff7ed;
+            color: #ea580c;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        .stat-value {
+            font-size: 27px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        /* ================= PANELS ================= */
+
+        .panel {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 22px;
+        }
+
+        .panel-header {
+            padding: 19px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 16px;
+        }
+
+        .panel-header p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .panel-body {
+            padding: 22px;
+        }
+
+        /* ================= TABLE ================= */
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: .5px;
+            text-align: left;
+            padding: 13px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #eef0f3;
+            font-size: 13px;
+        }
+
+        tr:hover td {
+            background: #fafbff;
+        }
+
+        /* ================= BADGES ================= */
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-completed {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-returned {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* ================= BUTTONS ================= */
+
+        .btn {
+            border: none;
+            border-radius: 9px;
+            padding: 9px 15px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: .2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-success {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-light {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .btn-sm {
+            padding: 6px 10px;
+            font-size: 11px;
+        }
+
+        /* ================= FORMS ================= */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 17px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid #d9dee7;
+            border-radius: 9px;
+            outline: none;
+            font-size: 13px;
+            background: white;
+            transition: .2s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, .08);
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ================= SEARCH ================= */
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .search-row input {
+            flex: 1;
+        }
+
+        /* ================= DASHBOARD ================= */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 20px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .quick-action {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .quick-action:hover {
+            border-color: var(--primary);
+            background: #fafaff;
+        }
+
+        .quick-action-icon {
+            font-size: 21px;
+            margin-bottom: 8px;
+        }
+
+        .quick-action strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .quick-action span {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* ================= REPORT ================= */
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .report-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .report-card h3 {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .report-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .money {
+            font-weight: 700;
+        }
+
+        /* ================= TOAST ================= */
+
+        .toast-container {
+            position: fixed;
+            right: 25px;
+            bottom: 25px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: #111827;
+            color: white;
+            padding: 13px 17px;
+            border-radius: 10px;
+            margin-top: 10px;
+            min-width: 250px;
+            font-size: 13px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+            animation: slideIn .25s ease;
+        }
+
+        .toast.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ================= EMPTY ================= */
+
+        .empty {
+            text-align: center;
+            color: var(--muted);
+            padding: 35px;
+            font-size: 13px;
+        }
+
+        /* ================= MOBILE ================= */
+
+        .mobile-menu {
+            display: none;
+        }
+
+        @media(max-width: 1000px) {
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 700px) {
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: .25s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .mobile-menu {
+                display: block;
+                border: none;
+                background: transparent;
+                font-size: 22px;
+                cursor: pointer;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .content {
+                padding: 20px 15px;
+            }
+
+            .stats-grid,
+            .report-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group.full {
+                grid-column: auto;
+            }
+
+            .search-row {
+                flex-direction: column;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+        <div class="logo-icon">M</div>
+        <div>
+            <h2>MicroSave</h2>
+            <span>Savings Management</span>
+        </div>
+    </div>
+
+    <div class="nav-title">Main</div>
+
+    <div class="nav-item active" onclick="showPage('dashboard', this)">
+        <span class="nav-icon">▦</span>
+        Dashboard
+    </div>
+
+    <div class="nav-item" onclick="showPage('groups', this)">
+        <span class="nav-icon">◉</span>
+        Groups
+    </div>
+
+    <div class="nav-item" onclick="showPage('members', this)">
+        <span class="nav-icon">♙</span>
+        Members
+    </div>
+
+    <div class="nav-item" onclick="showPage('contributions', this)">
+        <span class="nav-icon">₹</span>
+        Contributions
+    </div>
+
+    <div class="nav-item" onclick="showPage('loans', this)">
+        <span class="nav-icon">▣</span>
+        Loans
+    </div>
+
+    <div class="nav-item" onclick="showPage('repayments', this)">
+        <span class="nav-icon">↻</span>
+        Repayments
+    </div>
+
+    <div class="nav-title">Insights</div>
+
+    <div class="nav-item" onclick="showPage('reports', this)">
+        <span class="nav-icon">▥</span>
+        Reports
+    </div>
+
+</aside>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="main">
+
+    <header class="topbar">
+
+        <div style="display:flex;align-items:center;gap:15px;">
+
+            <button class="mobile-menu" onclick="toggleSidebar()">☰</button>
+
+            <div class="page-title">
+                <h1 id="pageHeading">Dashboard</h1>
+                <p id="pageSubheading">
+                    Overview of your savings group
+                </p>
+            </div>
+
+        </div>
+
+        <div class="system-status">
+            <span class="status-dot"></span>
+            Backend Connected
+        </div>
+
+    </header>
+
+
+    <section class="content">
+
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <div class="page active" id="dashboard">
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">Total Groups</div>
+                            <div class="stat-value" id="statGroups">0</div>
+                        </div>
+
+                        <div class="stat-icon icon-purple">
+                            ◉
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">Total Members</div>
+                            <div class="stat-value" id="statMembers">0</div>
+                        </div>
+
+                        <div class="stat-icon icon-blue">
+                            ♙
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">Total Contributions</div>
+                            <div class="stat-value" id="statContributions">
+                                ₹0
+                            </div>
+                        </div>
+
+                        <div class="stat-icon icon-green">
+                            ₹
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-top">
+                        <div>
+                            <div class="stat-label">Active Loans</div>
+                            <div class="stat-value" id="statLoans">0</div>
+                        </div>
+
+                        <div class="stat-icon icon-orange">
+                            ▣
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-grid">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Recent Loans</h2>
+                            <p>Latest loan activity</p>
+                        </div>
+
+                        <button class="btn btn-light btn-sm"
+                                onclick="showPageByName('loans')">
+                            View All
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+
+                        <table>
+
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Member</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+
+                            <tbody id="dashboardLoans"></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+
+                <div class="panel">
+
+                    <div class="panel-header">
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Common operations</p>
+                        </div>
+                    </div>
+
+                    <div class="panel-body">
+
+                        <div class="quick-actions">
+
+                            <div class="quick-action"
+                                 onclick="showPageByName('groups')">
+                                <div class="quick-action-icon">◉</div>
+                                <strong>Add Group</strong>
+                                <span>Create a new savings group</span>
+                            </div>
+
+                            <div class="quick-action"
+                                 onclick="showPageByName('members')">
+                                <div class="quick-action-icon">♙</div>
+                                <strong>Add Member</strong>
+                                <span>Register a group member</span>
+                            </div>
+
+                            <div class="quick-action"
+                                 onclick="showPageByName('contributions')">
+                                <div class="quick-action-icon">₹</div>
+                                <strong>Add Contribution</strong>
+                                <span>Record member savings</span>
+                            </div>
+
+                            <div class="quick-action"
+                                 onclick="showPageByName('loans')">
+                                <div class="quick-action-icon">▣</div>
+                                <strong>Create Loan</strong>
+                                <span>Issue a new loan</span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= GROUPS ================= -->
+
+        <div class="page" id="groups">
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <div>
+                        <h2>Add Group</h2>
+                        <p>Create a new self-help savings group</p>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+
+                    <form id="groupForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Group Name</label>
+                                <input id="groupName"
+                                       required
+                                       placeholder="e.g. MicroSave SHG">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Created Date</label>
+                                <input type="date"
+                                       id="groupDate"
+                                       required>
+                            </div>
+
+                            <div class="form-group full">
+                                <label>Description</label>
+                                <textarea id="groupDescription"
+                                          rows="3"
+                                          placeholder="Group description"></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary">
+                                Add Group
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>All Groups</h2>
+                        <p>Registered savings groups</p>
+                    </div>
+
+                    <button class="btn btn-light btn-sm"
+                            onclick="loadGroups()">
+                        Refresh
+                    </button>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Created Date</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="groupsTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= MEMBERS ================= -->
+
+        <div class="page" id="members">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Add Member</h2>
+                        <p>Register a member under a savings group</p>
+                    </div>
+
+                </div>
+
+                <div class="panel-body">
+
+                    <form id="memberForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input id="memberName"
+                                       required
+                                       placeholder="Member name">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input id="memberPhone"
+                                       required
+                                       placeholder="9876543210">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Join Date</label>
+                                <input type="date"
+                                       id="memberDate"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Status</label>
+
+                                <select id="memberStatus">
+                                    <option value="ACTIVE">ACTIVE</option>
+                                    <option value="INACTIVE">INACTIVE</option>
+                                </select>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Group ID</label>
+                                <input type="number"
+                                       id="memberGroupId"
+                                       required
+                                       placeholder="2">
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button class="btn btn-primary">
+                                Add Member
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Members</h2>
+                        <p>All registered members</p>
+                    </div>
+
+                    <button class="btn btn-light btn-sm"
+                            onclick="loadMembers()">
+                        Refresh
+                    </button>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Group</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="membersTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= CONTRIBUTIONS ================= -->
+
+        <div class="page" id="contributions">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Add Contribution</h2>
+                        <p>Record a member's savings contribution</p>
+                    </div>
+
+                </div>
+
+                <div class="panel-body">
+
+                    <form id="contributionForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Amount</label>
+                                <input type="number"
+                                       id="contributionAmount"
+                                       min="1"
+                                       required
+                                       placeholder="1000">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Contribution Date</label>
+                                <input type="date"
+                                       id="contributionDate"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Member ID</label>
+                                <input type="number"
+                                       id="contributionMemberId"
+                                       required
+                                       placeholder="4">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Group ID</label>
+                                <input type="number"
+                                       id="contributionGroupId"
+                                       required
+                                       placeholder="2">
+                            </div>
+
+                            <div class="form-group full">
+                                <label>Description</label>
+                                <input id="contributionDescription"
+                                       placeholder="Monthly contribution">
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button class="btn btn-primary">
+                                Add Contribution
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Contribution Records</h2>
+                        <p>All member contributions</p>
+                    </div>
+
+                    <button class="btn btn-light btn-sm"
+                            onclick="loadContributions()">
+                        Refresh
+                    </button>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Member ID</th>
+                            <th>Group ID</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="contributionsTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= LOANS ================= -->
+
+        <div class="page" id="loans">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Create Loan</h2>
+                        <p>Issue a loan from the available contribution pool</p>
+                    </div>
+
+                </div>
+
+                <div class="panel-body">
+
+                    <form id="loanForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Amount</label>
+                                <input type="number"
+                                       id="loanAmount"
+                                       min="1"
+                                       required
+                                       placeholder="500">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Loan Date</label>
+                                <input type="date"
+                                       id="loanDate"
+                                       required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Member ID</label>
+                                <input type="number"
+                                       id="loanMemberId"
+                                       required
+                                       placeholder="4">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Purpose</label>
+                                <input id="loanPurpose"
+                                       required
+                                       placeholder="Education">
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button class="btn btn-primary">
+                                Create Loan
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Loan Records</h2>
+                        <p>Track active and completed loans</p>
+                    </div>
+
+                    <button class="btn btn-light btn-sm"
+                            onclick="loadLoans()">
+                        Refresh
+                    </button>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Member</th>
+                            <th>Amount</th>
+                            <th>Purpose</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="loansTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= REPAYMENTS ================= -->
+
+        <div class="page" id="repayments">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Add Repayment</h2>
+                        <p>Record a loan repayment</p>
+                    </div>
+
+                </div>
+
+                <div class="panel-body">
+
+                    <form id="repaymentForm">
+
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Amount</label>
+
+                                <input type="number"
+                                       id="repaymentAmount"
+                                       min="1"
+                                       required
+                                       placeholder="200">
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Repayment Date</label>
+
+                                <input type="date"
+                                       id="repaymentDate"
+                                       required>
+
+                            </div>
+
+                            <div class="form-group">
+                                <label>Loan ID</label>
+
+                                <input type="number"
+                                       id="repaymentLoanId"
+                                       required
+                                       placeholder="3">
+
+                            </div>
+
+                        </div>
+
+                        <div class="form-actions">
+
+                            <button class="btn btn-primary">
+                                Add Repayment
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Repayment Records</h2>
+                        <p>All recorded repayments</p>
+                    </div>
+
+                    <button class="btn btn-light btn-sm"
+                            onclick="loadRepayments()">
+                        Refresh
+                    </button>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Loan ID</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="repaymentsTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= REPORTS ================= -->
+
+        <div class="page" id="reports">
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h2>Financial Reports</h2>
+                        <p>Overview of MicroSave activity</p>
+                    </div>
+
+                    <button class="btn btn-primary"
+                            onclick="loadDashboard()">
+                        Refresh Reports
+                    </button>
+
+                </div>
+
+                <div class="panel-body">
+
+                    <div class="report-grid">
+
+                        <div class="report-card">
+
+                            <h3>Total Groups</h3>
+
+                            <div class="report-number"
+                                 id="reportGroups">
+                                0
+                            </div>
+
+                        </div>
+
+
+                        <div class="report-card">
+
+                            <h3>Total Members</h3>
+
+                            <div class="report-number"
+                                 id="reportMembers">
+                                0
+                            </div>
+
+                        </div>
+
+
+                        <div class="report-card">
+
+                            <h3>Total Contributions</h3>
+
+                            <div class="report-number"
+                                 id="reportContributions">
+                                ₹0
+                            </div>
+
+                        </div>
+
+
+                        <div class="report-card">
+
+                            <h3>Total Loans</h3>
+
+                            <div class="report-number"
+                                 id="reportLoans">
+                                0
+                            </div>
+
+                        </div>
+
+
+                        <div class="report-card">
+
+                            <h3>Active Loans</h3>
+
+                            <div class="report-number"
+                                 id="reportActiveLoans">
+                                0
+                            </div>
+
+                        </div>
+
+
+                        <div class="report-card">
+
+                            <h3>Available Pool</h3>
+
+                            <div class="report-number"
+                                 id="reportPool">
+                                ₹0
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<div class="toast-container" id="toastContainer"></div>
+
+
+<script>
+
+    /* =========================================================
+       CONFIGURATION
+    ========================================================= */
+
+    const API = "/api";
+
+
+    /* =========================================================
+       GLOBAL DATA
+    ========================================================= */
+
+    let groups = [];
+    let members = [];
+    let contributions = [];
+    let loans = [];
+    let repayments = [];
+
+
+    /* =========================================================
+       INITIALIZATION
+    ========================================================= */
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        setDefaultDates();
+
+        loadDashboard();
+
+        loadGroups();
+        loadMembers();
+        loadContributions();
+        loadLoans();
+        loadRepayments();
+
+    });
+
+
+    /* =========================================================
+       DATE DEFAULTS
+    ========================================================= */
+
+    function today() {
+
+        const d = new Date();
+
+        return d.toISOString().split("T")[0];
+
+    }
+
+
+    function setDefaultDates() {
+
+        const date = today();
+
+        document.getElementById("groupDate").value = date;
+
+        document.getElementById("memberDate").value = date;
+
+        document.getElementById("contributionDate").value = date;
+
+        document.getElementById("loanDate").value = date;
+
+        document.getElementById("repaymentDate").value = date;
+
+    }
+
+
+    /* =========================================================
+       PAGE NAVIGATION
+    ========================================================= */
+
+    function showPage(pageId, element) {
+
+        document.querySelectorAll(".page")
+            .forEach(page => page.classList.remove("active"));
+
+        const page = document.getElementById(pageId);
+
+        if (page) {
+            page.classList.add("active");
+        }
+
+
+        document.querySelectorAll(".nav-item")
+            .forEach(item => item.classList.remove("active"));
+
+        if (element) {
+            element.classList.add("active");
+        }
+
+
+        updatePageTitle(pageId);
+
+        if (window.innerWidth <= 700) {
+            document.getElementById("sidebar")
+                .classList.remove("open");
+        }
+
+    }
+
+
+    function showPageByName(pageId) {
+
+        const nav = document.querySelectorAll(".nav-item");
+
+        let target = null;
+
+        nav.forEach(item => {
+
+            if (
+                item.textContent
+                    .trim()
+                    .toLowerCase()
+                    .includes(
+                        pageId === "dashboard"
+                            ? "dashboard"
+                            : pageId
+                    )
+            ) {
+                target = item;
+            }
+
+        });
+
+        showPage(pageId, target);
+
+    }
+
+
+    function updatePageTitle(pageId) {
+
+        const titles = {
+
+            dashboard: [
+                "Dashboard",
+                "Overview of your savings group"
+            ],
+
+            groups: [
+                "Groups",
+                "Manage self-help savings groups"
+            ],
+
+            members: [
+                "Members",
+                "Manage group members"
+            ],
+
+            contributions: [
+                "Contributions",
+                "Track member savings"
+            ],
+
+            loans: [
+                "Loans",
+                "Manage group loans"
+            ],
+
+            repayments: [
+                "Repayments",
+                "Track loan repayments"
+            ],
+
+            reports: [
+                "Reports",
+                "Financial overview and insights"
+            ]
+
+        };
+
+
+        if (titles[pageId]) {
+
+            document.getElementById("pageHeading")
+                .textContent = titles[pageId][0];
+
+            document.getElementById("pageSubheading")
+                .textContent = titles[pageId][1];
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================= */
+
+    function toggleSidebar() {
+
+        document
+            .getElementById("sidebar")
+            .classList.toggle("open");
+
+    }
+
+
+    /* =========================================================
+       API HELPER
+    ========================================================= */
+
+    async function apiRequest(url, options = {}) {
+
+        try {
+
+            const response = await fetch(API + url, {
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                ...options
+
+            });
+
+
+            const text = await response.text();
+
+            let data;
+
+            try {
+
+                data = text
+                    ? JSON.parse(text)
+                    : text;
+
+            } catch {
+
+                data = text;
+
+            }
+
+
+            if (!response.ok) {
+
+                let message = "";
+
+                if (typeof data === "string") {
+                    message = data;
+                }
+                else if (data && data.message) {
+                    message = data.message;
+                }
+                else {
+                    message = "Request failed";
+                }
+
+                throw new Error(message);
+
+            }
+
+
+            return data;
+
+        }
+        catch (error) {
+
+            showToast(error.message, "error");
+
+            throw error;
+
+        }
+
+    }
+
+
+    /* =========================================================
+       TOAST
+    ========================================================= */
+
+    function showToast(message, type = "success") {
+
+        const container =
+            document.getElementById("toastContainer");
+
+
+        const toast =
+            document.createElement("div");
+
+        toast.className =
+            "toast " + type;
+
+        toast.textContent = message;
+
+
+        container.appendChild(toast);
+
+
+        setTimeout(() => {
+
+            toast.remove();
+
+        }, 3500);
+
+    }
+
+
+    /* =========================================================
+       GROUPS
+    ========================================================= */
+
+    async function loadGroups() {
+
+        try {
+
+            groups =
+                await apiRequest("/groups/all");
+
+            renderGroups();
+
+            updateDashboardStats();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    function renderGroups() {
+
+        const table =
+            document.getElementById("groupsTable");
+
+
+        if (!groups.length) {
+
+            table.innerHTML =
+                `<tr>
+                <td colspan="5" class="empty">
+                    No groups found
+                </td>
+            </tr>`;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            groups.map(group => `
+
+            <tr>
+
+                <td>${group.id}</td>
+
+                <td>
+                    <strong>${escapeHtml(group.name)}</strong>
+                </td>
+
+                <td>
+                    ${escapeHtml(group.description || "-")}
+                </td>
+
+                <td>
+                    ${group.createdDate || "-"}
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteGroup(${group.id})">
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    }
+
+
+    async function deleteGroup(id) {
+
+        if (!confirm(
+            "Are you sure you want to delete this group?"
+        )) return;
+
+
+        try {
+
+            await apiRequest(
+                `/groups/delete/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            showToast("Group deleted successfully");
+
+            loadGroups();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    /* =========================================================
+       MEMBERS
+    ========================================================= */
+
+    async function loadMembers() {
+
+        try {
+
+            members =
+                await apiRequest("/members/all");
+
+            renderMembers();
+
+            updateDashboardStats();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    function renderMembers() {
+
+        const table =
+            document.getElementById("membersTable");
+
+
+        if (!members.length) {
+
+            table.innerHTML =
+                `<tr>
+                <td colspan="7" class="empty">
+                    No members found
+                </td>
+            </tr>`;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            members.map(member => `
+
+            <tr>
+
+                <td>${member.id}</td>
+
+                <td>
+                    <strong>${escapeHtml(member.name)}</strong>
+                </td>
+
+                <td>${escapeHtml(member.phone || "-")}</td>
+
+                <td>
+                    <span class="badge badge-pending">
+                        Group ${member.groupId}
+                    </span>
+                </td>
+
+                <td>${member.joinDate || "-"}</td>
+
+                <td>
+                    <span class="badge ${
+                member.status === "ACTIVE"
+                    ? "badge-active"
+                    : "badge-pending"
+            }">
+                        ${member.status}
+                    </span>
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteMember(${member.id})">
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    }
+
+
+    async function deleteMember(id) {
+
+        if (!confirm(
+            "Are you sure you want to delete this member?"
+        )) return;
+
+
+        try {
+
+            await apiRequest(
+                `/members/delete/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            showToast("Member deleted successfully");
+
+            loadMembers();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    /* =========================================================
+       CONTRIBUTIONS
+    ========================================================= */
+
+    async function loadContributions() {
+
+        try {
+
+            contributions =
+                await apiRequest("/contributions/all");
+
+            renderContributions();
+
+            updateDashboardStats();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    function renderContributions() {
+
+        const table =
+            document.getElementById("contributionsTable");
+
+
+        if (!contributions.length) {
+
+            table.innerHTML =
+                `<tr>
+                <td colspan="7" class="empty">
+                    No contribution records found
+                </td>
+            </tr>`;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            contributions.map(c => `
+
+            <tr>
+
+                <td>${c.id}</td>
+
+                <td>Member ${c.memberId}</td>
+
+                <td>Group ${c.groupId}</td>
+
+                <td class="money">
+                    ₹${Number(c.amount).toLocaleString("en-IN")}
+                </td>
+
+                <td>${c.contributionDate || "-"}</td>
+
+                <td>
+                    ${escapeHtml(c.description || "-")}
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteContribution(${c.id})">
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    }
+
+
+    async function deleteContribution(id) {
+
+        if (!confirm(
+            "Are you sure you want to delete this contribution?"
+        )) return;
+
+
+        try {
+
+            await apiRequest(
+                `/contributions/delete/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            showToast(
+                "Contribution deleted successfully"
+            );
+
+            loadContributions();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    /* =========================================================
+       LOANS
+    ========================================================= */
+
+    async function loadLoans() {
+
+        try {
+
+            loans =
+                await apiRequest("/loans/all");
+
+            renderLoans();
+
+            updateDashboardStats();
+
+            renderDashboardLoans();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    function renderLoans() {
+
+        const table =
+            document.getElementById("loansTable");
+
+
+        if (!loans.length) {
+
+            table.innerHTML =
+                `<tr>
+                <td colspan="7" class="empty">
+                    No loan records found
+                </td>
+            </tr>`;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            loans.map(loan => `
+
+            <tr>
+
+                <td>${loan.id}</td>
+
+                <td>Member ${loan.memberId}</td>
+
+                <td class="money">
+                    ₹${Number(loan.amount)
+                .toLocaleString("en-IN")}
+                </td>
+
+                <td>
+                    ${escapeHtml(loan.purpose || "-")}
+                </td>
+
+                <td>${loan.loanDate || "-"}</td>
+
+                <td>
+
+                    <span class="badge ${
+                loan.status === "ACTIVE"
+                    ? "badge-active"
+                    : "badge-completed"
+            }">
+
+                        ${loan.status}
+
+                    </span>
+
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteLoan(${loan.id})">
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    }
+
+
+    function renderDashboardLoans() {
+
+        const table =
+            document.getElementById("dashboardLoans");
+
+
+        const latest =
+            [...loans]
+                .reverse()
+                .slice(0, 5);
+
+
+        if (!latest.length) {
+
+            table.innerHTML =
+                `<tr>
+                <td colspan="4" class="empty">
+                    No loan activity
+                </td>
+            </tr>`;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            latest.map(loan => `
+
+            <tr>
+
+                <td>#${loan.id}</td>
+
+                <td>Member ${loan.memberId}</td>
+
+                <td class="money">
+                    ₹${Number(loan.amount)
+                .toLocaleString("en-IN")}
+                </td>
+
+                <td>
+
+                    <span class="badge ${
+                loan.status === "ACTIVE"
+                    ? "badge-active"
+                    : "badge-completed"
+            }">
+
+                        ${loan.status}
+
+                    </span>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    }
+
+
+    async function deleteLoan(id) {
+
+        if (!confirm(
+            "Are you sure you want to delete this loan?"
+        )) return;
+
+
+        try {
+
+            await apiRequest(
+                `/loans/delete/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            showToast("Loan deleted successfully");
+
+            loadLoans();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    /* =========================================================
+       REPAYMENTS
+    ========================================================= */
+
+    async function loadRepayments() {
+
+        try {
+
+            repayments =
+                await apiRequest("/repayments/all");
+
+            renderRepayments();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    function renderRepayments() {
+
+        const table =
+            document.getElementById("repaymentsTable");
+
+
+        if (!repayments.length) {
+
+            table.innerHTML =
+                `<tr>
+                <td colspan="5" class="empty">
+                    No repayment records found
+                </td>
+            </tr>`;
+
+            return;
+
+        }
+
+
+        table.innerHTML =
+            repayments.map(r => `
+
+            <tr>
+
+                <td>${r.id}</td>
+
+                <td>Loan ${r.loanId}</td>
+
+                <td class="money">
+                    ₹${Number(r.amount)
+                .toLocaleString("en-IN")}
+                </td>
+
+                <td>${r.repaymentDate || "-"}</td>
+
+                <td>
+
+                    <button
+                        class="btn btn-danger btn-sm"
+                        onclick="deleteRepayment(${r.id})">
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    }
+
+
+    async function deleteRepayment(id) {
+
+        if (!confirm(
+            "Are you sure you want to delete this repayment?"
+        )) return;
+
+
+        try {
+
+            await apiRequest(
+                `/repayments/delete/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            showToast(
+                "Repayment deleted successfully"
+            );
+
+            loadRepayments();
+
+            loadLoans();
+
+        }
+        catch (e) {}
+
+    }
+
+
+    /* =========================================================
+       DASHBOARD
+    ========================================================= */
+
+    async function loadDashboard() {
+
+        await Promise.all([
+            loadGroups(),
+            loadMembers(),
+            loadContributions(),
+            loadLoans(),
+            loadRepayments()
+        ]);
+
+        updateDashboardStats();
+
+    }
+
+
+    function updateDashboardStats() {
+
+        const totalContribution =
+            contributions.reduce(
+                (sum, c) =>
+                    sum + Number(c.amount || 0),
+                0
+            );
+
+
+        const activeLoans =
+            loans.filter(
+                loan => loan.status === "ACTIVE"
+            );
+
+
+        document.getElementById("statGroups")
+            .textContent = groups.length;
+
+
+        document.getElementById("statMembers")
+            .textContent = members.length;
+
+
+        document.getElementById("statContributions")
+            .textContent =
+            "₹" +
+            totalContribution.toLocaleString("en-IN");
+
+
+        document.getElementById("statLoans")
+            .textContent = activeLoans.length;
+
+
+        document.getElementById("reportGroups")
+            .textContent = groups.length;
+
+
+        document.getElementById("reportMembers")
+            .textContent = members.length;
+
+
+        document.getElementById("reportContributions")
+            .textContent =
+            "₹" +
+            totalContribution.toLocaleString("en-IN");
+
+
+        document.getElementById("reportLoans")
+            .textContent = loans.length;
+
+
+        document.getElementById("reportActiveLoans")
+            .textContent = activeLoans.length;
+
+
+        const activeLoanAmount =
+            activeLoans.reduce(
+                (sum, loan) =>
+                    sum + Number(loan.amount || 0),
+                0
+            );
+
+
+        const availablePool =
+            totalContribution - activeLoanAmount;
+
+
+        document.getElementById("reportPool")
+            .textContent =
+            "₹" +
+            Math.max(availablePool, 0)
+                .toLocaleString("en-IN");
+
+    }
+
+
+    /* =========================================================
+       FORMS
+    ========================================================= */
+
+
+    /* GROUP */
+
+    document.getElementById("groupForm")
+        .addEventListener("submit", async function(e) {
+
+            e.preventDefault();
+
+
+            const body = {
+
+                name:
+                document.getElementById("groupName")
+                    .value,
+
+                description:
+                document.getElementById("groupDescription")
+                    .value,
+
+                createdDate:
+                document.getElementById("groupDate")
+                    .value
+
+            };
+
+
+            try {
+
+                await apiRequest(
+                    "/groups/add",
+                    {
+                        method: "POST",
+                        body: JSON.stringify(body)
+                    }
+                );
+
+
+                showToast(
+                    "Group added successfully"
+                );
+
+
+                this.reset();
+
+                document.getElementById("groupDate")
+                    .value = today();
+
+
+                loadGroups();
+
+            }
+            catch (e) {}
+
+        });
+
+
+    /* MEMBER */
+
+    document.getElementById("memberForm")
+        .addEventListener("submit", async function(e) {
+
+            e.preventDefault();
+
+
+            const body = {
+
+                name:
+                document.getElementById("memberName")
+                    .value,
+
+                phone:
+                document.getElementById("memberPhone")
+                    .value,
+
+                joinDate:
+                document.getElementById("memberDate")
+                    .value,
+
+                status:
+                document.getElementById("memberStatus")
+                    .value,
+
+                groupId:
+                    Number(
+                        document.getElementById("memberGroupId")
+                            .value
+                    )
+
+            };
+
+
+            try {
+
+                await apiRequest(
+                    "/members/add",
+                    {
+                        method: "POST",
+                        body: JSON.stringify(body)
+                    }
+                );
+
+
+                showToast(
+                    "Member added successfully"
+                );
+
+
+                this.reset();
+
+                document.getElementById("memberDate")
+                    .value = today();
+
+
+                loadMembers();
+
+            }
+            catch (e) {}
+
+        });
+
+
+    /* CONTRIBUTION */
+
+    document.getElementById("contributionForm")
+        .addEventListener("submit", async function(e) {
+
+            e.preventDefault();
+
+
+            const body = {
+
+                amount:
+                    Number(
+                        document.getElementById(
+                            "contributionAmount"
+                        ).value
+                    ),
+
+                contributionDate:
+                document.getElementById(
+                    "contributionDate"
+                ).value,
+
+                description:
+                document.getElementById(
+                    "contributionDescription"
+                ).value,
+
+                memberId:
+                    Number(
+                        document.getElementById(
+                            "contributionMemberId"
+                        ).value
+                    ),
+
+                groupId:
+                    Number(
+                        document.getElementById(
+                            "contributionGroupId"
+                        ).value
+                    )
+
+            };
+
+
+            try {
+
+                await apiRequest(
+                    "/contributions/add",
+                    {
+                        method: "POST",
+                        body: JSON.stringify(body)
+                    }
+                );
+
+
+                showToast(
+                    "Contribution added successfully"
+                );
+
+
+                this.reset();
+
+                document.getElementById(
+                    "contributionDate"
+                ).value = today();
+
+
+                loadContributions();
+
+            }
+            catch (e) {}
+
+        });
+
+
+    /* LOAN */
+
+    document.getElementById("loanForm")
+        .addEventListener("submit", async function(e) {
+
+            e.preventDefault();
+
+
+            const body = {
+
+                amount:
+                    Number(
+                        document.getElementById(
+                            "loanAmount"
+                        ).value
+                    ),
+
+                loanDate:
+                document.getElementById(
+                    "loanDate"
+                ).value,
+
+                purpose:
+                document.getElementById(
+                    "loanPurpose"
+                ).value,
+
+                memberId:
+                    Number(
+                        document.getElementById(
+                            "loanMemberId"
+                        ).value
+                    )
+
+            };
+
+
+            try {
+
+                await apiRequest(
+                    "/loans/add",
+                    {
+                        method: "POST",
+                        body: JSON.stringify(body)
+                    }
+                );
+
+
+                showToast(
+                    "Loan created successfully"
+                );
+
+
+                this.reset();
+
+                document.getElementById("loanDate")
+                    .value = today();
+
+
+                loadLoans();
+
+            }
+            catch (e) {}
+
+        });
+
+
+    /* REPAYMENT */
+
+    document.getElementById("repaymentForm")
+        .addEventListener("submit", async function(e) {
+
+            e.preventDefault();
+
+
+            const body = {
+
+                amount:
+                    Number(
+                        document.getElementById(
+                            "repaymentAmount"
+                        ).value
+                    ),
+
+                repaymentDate:
+                document.getElementById(
+                    "repaymentDate"
+                ).value,
+
+                loanId:
+                    Number(
+                        document.getElementById(
+                            "repaymentLoanId"
+                        ).value
+                    )
+
+            };
+
+
+            try {
+
+                await apiRequest(
+                    "/repayments/add",
+                    {
+                        method: "POST",
+                        body: JSON.stringify(body)
+                    }
+                );
+
+
+                showToast(
+                    "Repayment added successfully"
+                );
+
+
+                this.reset();
+
+                document.getElementById(
+                    "repaymentDate"
+                ).value = today();
+
+
+                loadRepayments();
+
+                loadLoans();
+
+            }
+            catch (e) {}
+
+        });
+
+
+    /* =========================================================
+       HTML ESCAPE
+    ========================================================= */
+
+    function escapeHtml(value) {
+
+        if (value === null ||
+            value === undefined) {
+
+            return "";
+
+        }
+
+
+        return String(value)
+
+            .replace(/&/g, "&amp;")
+
+            .replace(/</g, "&lt;")
+
+            .replace(/>/g, "&gt;")
+
+            .replace(/"/g, "&quot;")
+
+            .replace(/'/g, "&#039;");
+
+    }
+
+</script>
+
+</body>
+</html>
